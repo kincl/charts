@@ -1,0 +1,32 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ include "skupper-hub-bridge.fullname" . }}-job
+  labels:
+    {{- include "skupper-hub-bridge.labels" . | nindent 4 }}
+spec:
+  template:
+    metadata:
+      labels:
+        {{- include "skupper-hub-bridge.selectorLabels" . | nindent 8 }}
+    spec:
+      serviceAccountName: skupper-hub-bridge
+      restartPolicy: OnFailure
+      containers:
+      - name: script-runner
+        image: "{{ .Values.job.repository }}:{{ .Values.job.tag | default "latest" }}"
+        command: ["/bin/bash"]
+        args: ["/scripts/script.sh"]
+        volumeMounts:
+        - name: scripts
+          mountPath: /scripts
+          readOnly: true
+        env:
+        # Add any environment variables your script needs
+        - name: CLUSTER
+          value: {{ .Release.Namespace | quote }}
+      volumes:
+      - name: scripts
+        configMap:
+          name: {{ include "skupper-hub-bridge.fullname" . }}-scripts
+          defaultMode: 0755  # Make scripts executable

@@ -1,0 +1,15 @@
+{{- if .Values.storage }}
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ include "simple.name" . }}
+  labels:
+    {{- include "simple.labels" . | nindent 4 }}
+spec:
+  accessModes:
+    - ReadWriteOnce
+  volumeMode: Filesystem
+  resources:
+    requests:
+      storage: {{ index (splitList "," .Values.storage) 1 }}
+{{- end }}

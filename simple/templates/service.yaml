@@ -1,0 +1,16 @@
+{{- if .Values.ports }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "simple.name" . }}
+  labels:
+    {{- include "simple.labels" . | nindent 4 }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- with .Values.ports }}
+  ports: {{ include "simple.ports" . | indent 4 }}
+  {{- end }}
+
+  selector:
+    {{- include "simple.selectorLabels" . | nindent 4 }}
+{{- end }}

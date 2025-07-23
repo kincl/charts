@@ -1,0 +1,9 @@
+clusterName: ''
+dns:
+  zone: example.com
+  serviceIP: 172.30.0.5
+  upstreamIP: 172.30.0.10
+
+job:
+  repository: image-registry.openshift-image-registry.svc:5000/openshift/cli
+  tag: latest

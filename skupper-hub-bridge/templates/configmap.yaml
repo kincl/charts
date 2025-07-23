@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "skupper-hub-bridge.fullname" . }}-scripts
+  labels:
+    {{- include "skupper-hub-bridge.labels" . | nindent 4 }}
+data:
+  script.sh: |
+{{ .Files.Get "scripts/create-home-accesstoken.sh" | indent 4 }}

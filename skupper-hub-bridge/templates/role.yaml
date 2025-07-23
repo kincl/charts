@@ -1,0 +1,17 @@
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: skupper-hub-bridge
+rules:
+  - apiGroups: [""]
+    resources: ["secrets"]
+    verbs: ["get", "list"]
+  - apiGroups: ["skupper.io"]
+    resources: ["links"]
+    verbs: ["get", "list"]
+  - apiGroups: ["skupper.io"]
+    resources: ["accesstokens"]
+    verbs: ["create", "get", "list", "update", "patch", "delete", "watch"]
+  - apiGroups: ["hive.openshift.io"]
+    resources: ["clusterdeployments"]
+    verbs: ["get", "list"]

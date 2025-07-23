@@ -1,0 +1,18 @@
+{{- if .Values.hostname }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "simple.name" . }}
+  labels:
+    {{- include "simple.labels" . | nindent 4 }}
+spec:
+  host: {{ .Values.hostname }}
+  port:
+    targetPort: {{ .Values.route.targetPort | default (index (splitList ":" (index (splitList "," .Values.ports) 0)) 1) }}
+  tls:
+    termination: edge
+  to:
+    kind: Service
+    name: {{ include "simple.name" . }}
+    weight: 100
+{{- end }}
