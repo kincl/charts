@@ -1,0 +1,76 @@
+name: Publish Helm Charts
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'simple/**'
+      - 'skupper-hub-bridge/**'
+      - '.github/workflows/publish-charts.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config user.name "${{ github.actor }}"
+          git config user.email "${{ github.actor }}@users.noreply.github.com"
+
+      - name: Install Helm
+        uses: azure/setup-helm@v3
+        with:
+          version: v3.10.0
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v3
+
+      - name: Create Helm Chart Package Directory
+        run: mkdir -p .gh-pages/charts
+
+      - name: Package Helm Charts
+        run: |
+          for chart in simple skupper-hub-bridge; do
+            helm package $chart -d .gh-pages/charts
+          done
+
+      - name: Update Helm Repository Index
+        run: |
+          # If this is not the first release, get the existing index.yaml
+          if curl -sSf -o index.yaml "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/index.yaml"; then
+            echo "Retrieved existing index.yaml"
+            helm repo index .gh-pages/charts --url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts" --merge index.yaml
+          else
+            echo "No existing index.yaml found, creating new one"
+            helm repo index .gh-pages/charts --url "https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/charts"
+          fi
+          mv .gh-pages/charts/index.yaml .gh-pages/index.yaml
+
+          # Copy README to GitHub Pages
+          cp pages/gh-pages-readme.md .gh-pages/README.md
+
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v2
+        with:
+          path: .gh-pages
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v2
+
+      - name: Summary
+        run: |
+          echo "📊 Helm Charts deployed to GitHub Pages"
+          echo "🔗 Repository URL: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/index.yaml"

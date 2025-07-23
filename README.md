@@ -2,6 +2,23 @@
 
 This repository contains a collection of Helm charts for Kubernetes deployment.
 
+## Using the Published Charts
+
+To use the published charts, add this repository to your Helm repos:
+
+```bash
+helm repo add kincl https://kincl.github.io/charts/
+helm repo update
+```
+
+Then you can install the charts:
+
+```bash
+helm install my-release kincl/simple
+# or
+helm install my-bridge kincl/skupper-hub-bridge
+```
+
 ## Available Charts
 
 ### Simple Chart
