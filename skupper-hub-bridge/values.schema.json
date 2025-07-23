@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "dns": {
+      "type": "object",
+      "properties": {
+        "zone": {
+          "type": "string",
+          "description": "DNS zone for the hub bridge",
+          "examples": ["example.com"]
+        },
+        "serviceIP": {
+          "type": "string",
+          "description": "Service IP address",
+          "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$",
+          "examples": ["172.30.0.5"]
+        },
+        "upstreamIP": {
+          "type": "string",
+          "description": "Upstream IP address",
+          "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$",
+          "examples": ["172.30.0.10"]
+        }
+      },
+      "required": ["zone"],
+      "additionalProperties": false
+    },
+    "clusterName": {
+      "type": "string",
+      "description": "Name of the cluster (defaults to namespace)",
+      "examples": ["my-cluster"]
+    },
+    "job": {
+      "type": "object",
+      "properties": {
+        "repository": {
+          "type": "string",
+          "description": "Container image repository for the job",
+          "examples": [
+            "image-registry.openshift-image-registry.svc:5000/openshift/cli"
+          ]
+        },
+        "tag": {
+          "type": "string",
+          "description": "Container image tag for the job",
+          "examples": ["latest"]
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "required": ["dns"],
+  "additionalProperties": false
+}
