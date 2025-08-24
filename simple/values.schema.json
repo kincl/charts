@@ -29,46 +29,12 @@
       "examples": ["anyuid"]
     },
     "ports": {
-      "type": "array",
-      "description": "List of ports to expose",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "containerPort": {
-            "type": "integer"
-          },
-          "protocol": {
-            "type": "string",
-            "enum": ["TCP", "UDP"]
-          },
-          "targetPort": {
-            "type": "integer"
-          }
-        },
-        "required": ["containerPort"]
-      }
+      "type": "string",
+      "description": "Port to expose"
     },
     "env": {
-      "type": "array",
-      "description": "Environment variables",
-      "items": {
-        "type": "object",
-        "properties": {
-          "name": {
-            "type": "string"
-          },
-          "value": {
-            "type": "string"
-          },
-          "valueFrom": {
-            "type": "object"
-          }
-        },
-        "required": ["name"]
-      }
+      "type": "string",
+      "description": "Environment variables"
     },
     "storage": {
       "type": ["string", "object"],
