@@ -11,7 +11,7 @@ Parameter | Description | Example
 `scc` | SecurityContextConstraints (OpenShift) | `anyuid`
 `ports` | Comma-separated list of source:destination ports | `8080:80,9000:9000`
 `env` | Environment variables in key=value format | `DB_HOST=mysql,API_KEY=secret123`
-`storage` | Mount path and size for persistent storage | `/test,1Gi`
+`storage` | Mount path and size for persistent storage (comma-separated for single, colon-separated for multiple) | `/test,1Gi` or `/data,1Gi:/home,10Gi`
 
 ## Installation
 
@@ -27,10 +27,20 @@ helm install myapp ./simple \
   --set-literal storage="/test,1Gi"
 ```
 
+### Storage Configuration
+
+The `storage` parameter supports multiple formats:
+
+- **Single volume**: `/data,1Gi` (mount path, size)
+- **Multiple volumes** (colon-separated): `/data,1Gi:/home,10Gi`
+- **Custom PVC name**: `/data,1Gi,custom-name` (third field is optional PVC name)
+
+PVC names are derived from mount paths (slashes replaced with dashes, leading slash removed) unless a custom name is provided.
+
 ## Notes
 
 - When setting any variables with commas, use `--set-literal` to preserve the comma
 - The `scc` parameter is specific to OpenShift environments, common options are: [anyuid, nonroot-v2, privileged]
 - Ports are specified as `sourcePort:destinationPort` pairs, multiple pairs can be comma-separated
 - The hostname parameter will create a Route (OpenShift) or Ingress (Kubernetes) resource
-- Storage parameter format is `mountPath,storageSize` where storageSize follows Kubernetes conventions (e.g., Mi, Gi)
+- Storage supports single or multiple volumes. Use commas to separate path,size,name and colons to separate multiple volumes

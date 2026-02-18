@@ -1,17 +1,32 @@
-{{- if .Values.storage }}
+{{- $storage := .Values.storage }}
+{{- if $storage }}
+{{- $vols := splitList ":" $storage }}
+{{- range $i, $vol := $vols }}
+{{- $parts := splitList "," $vol }}
+{{- $mountPath := index $parts 0 }}
+{{- $customName := "" }}
+{{- if gt (len $parts) 2 }}
+{{- $customName = index $parts 2 }}
+{{- end }}
+{{- $name := $customName }}
+{{- if not $name }}
+{{- $name = replace "/" "-" $mountPath | trimPrefix "-" }}
+{{- end }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "simple.name" . }}
+  name: {{ $name }}
   annotations:
     "helm.sh/resource-policy": keep
   labels:
-    {{- include "simple.labels" . | nindent 4 }}
+    {{- include "simple.labels" $ | nindent 4 }}
 spec:
   accessModes:
     - ReadWriteOnce
   volumeMode: Filesystem
   resources:
     requests:
-      storage: {{ index (splitList "," .Values.storage) 1 }}
+      storage: {{ index $parts 1 }}
+---
+{{- end }}
 {{- end }}

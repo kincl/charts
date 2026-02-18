@@ -47,6 +47,9 @@ livenessProbe: {}
 readinessProbe: {}
 
 storage: ""
+# Single volume: /data,1Gi
+# Multiple volumes (colon-separated): /data,1Gi:/home,10Gi
+# Custom PVC name (third field): /data,1Gi,custom-name
 
 volumes: []
 # - name: foo

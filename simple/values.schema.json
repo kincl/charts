@@ -37,8 +37,8 @@
       "description": "Environment variables"
     },
     "storage": {
-      "type": ["string", "object"],
-      "description": "Persistent storage configuration"
+      "type": "string",
+      "description": "Persistent storage configuration (format: /path,size or /path,size,name for single; /path,size:/path2,size2 for multiple)"
     },
     "serviceAccount": {
       "type": "object",
