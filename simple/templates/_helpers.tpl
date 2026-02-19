@@ -69,10 +69,11 @@ Usage: {{ include "simple.ports" .Values.env | nindent 12 }}
 {{- end }}
 
 {{/*
-Parse a volume entry and return a map with name, mountPath, and size
-Usage: {{ include "simple.parseVolume" "/data,1Gi" }}
+Parse a storage volume entry and return flow-style YAML map
+Usage: {{ include "simple.parseStorageVolume" . }}
+Returns: flow-style YAML like "{name: data, mountPath: /data, size: 1Gi}"
 */}}
-{{- define "simple.parseVolume" -}}
+{{- define "simple.parseStorageVolume" -}}
 {{- $parts := splitList "," . }}
 {{- $mountPath := index $parts 0 }}
 {{- $size := index $parts 1 }}
@@ -84,25 +85,47 @@ Usage: {{ include "simple.parseVolume" "/data,1Gi" }}
 {{- if not $name }}
 {{- $name = replace "/" "-" $mountPath | trimPrefix "-" }}
 {{- end }}
-{{- printf "name: %s\nmountPath: %s\nsize: %s\n" $name $mountPath $size }}
+{{- printf "{name: %s, mountPath: %s, size: %s}" $name $mountPath $size }}
 {{- end }}
 
 {{/*
-Convert storage string (old format) to list of volume maps
-Supports: /data,1Gi (single) or /data,1Gi:/home,10Gi (multi-colon)
+Convert storage string to list of volume maps
+Usage: {{ include "simple.parseStorage" . | fromYaml }}
+Returns: list of maps from parseStorageVolume
 */}}
 {{- define "simple.parseStorage" -}}
 {{- $storage := .Values.storage }}
 {{- if $storage }}
 {{- $vols := splitList ":" $storage }}
-{{- $count := len $vols }}
+{{- $result := list }}
 {{- range $i, $vol := $vols }}
-{{- include "simple.parseVolume" $vol }}
-{{- if lt $i (sub $count 1)}}
----
-{{- end}}
+{{- $result = append $result (include "simple.parseStorageVolume" $vol) }}
+{{- end }}
+{{- $result | toYaml }}
+{{- else }}
+{{- "[]" }}
 {{- end }}
 {{- end }}
+
+{{/*
+Output volume entry for volumes list
+Usage: {{ include "simple.volumeEntry" . | nindent 2 }}
+*/}}
+{{- define "simple.volumeEntry" -}}
+{{- $vol := include "simple.parseStorageVolume" . | fromYaml }}
+- name: {{ $vol.name }}
+  persistentVolumeClaim:
+    claimName: {{ $vol.name }}
+{{- end }}
+
+{{/*
+Output volumeMount entry for volumeMounts list
+Usage: {{ include "simple.volumeMountEntry" . | nindent 2 }}
+*/}}
+{{- define "simple.volumeMountEntry" -}}
+{{- $vol := include "simple.parseStorageVolume" . | fromYaml }}
+- mountPath: {{ $vol.mountPath }}
+  name: {{ $vol.name }}
 {{- end }}
 
 {{/*
@@ -117,24 +140,12 @@ Usage: {{ include "simple.volumes" . | nindent 12 }}
 volumes:
 {{- if $storage }}
 {{- $vols := splitList ":" $storage }}
-{{- range $i, $vol := $vols }}
-{{- $parts := splitList "," $vol }}
-{{- $mountPath := index $parts 0 }}
-{{- $customName := "" }}
-{{- if gt (len $parts) 2 }}
-{{- $customName = index $parts 2 }}
-{{- end }}
-{{- $name := $customName }}
-{{- if not $name }}
-{{- $name = replace "/" "-" $mountPath | trimPrefix "-" }}
-{{- end }}
-- name: {{ $name }}
-  persistentVolumeClaim:
-    claimName: {{ $name }}
+{{- range $volStr := $vols }}
+{{- include "simple.volumeEntry" $volStr }}
 {{- end }}
 {{- end }}
 {{- range $volume := $dynamicVolumes }}
-- {{ toYaml $volume | indent 2 | trimPrefix "  " }}
+- {{ toYaml $volume | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}
@@ -151,23 +162,12 @@ Usage: {{ include "simple.volumeMounts" . | nindent 12 }}
 volumeMounts:
 {{- if $storage }}
 {{- $vols := splitList ":" $storage }}
-{{- range $i, $vol := $vols }}
-{{- $parts := splitList "," $vol }}
-{{- $mountPath := index $parts 0 }}
-{{- $customName := "" }}
-{{- if gt (len $parts) 2 }}
-{{- $customName = index $parts 2 }}
-{{- end }}
-{{- $name := $customName }}
-{{- if not $name }}
-{{- $name = replace "/" "-" $mountPath | trimPrefix "-" }}
-{{- end }}
-- mountPath: {{ $mountPath }}
-  name: {{ $name }}
+{{- range $volStr := $vols }}
+{{- include "simple.volumeMountEntry" $volStr }}
 {{- end }}
 {{- end }}
 {{- range $volume := $dynamicVolumes }}
-- {{ toYaml $volume | indent 2 | trimPrefix "  " }}
+- {{ toYaml $volume | nindent 2 }}
 {{- end }}
 {{- end }}
 {{- end }}

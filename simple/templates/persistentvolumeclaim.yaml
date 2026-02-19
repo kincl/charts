@@ -1,21 +1,12 @@
 {{- $storage := .Values.storage }}
 {{- if $storage }}
 {{- $vols := splitList ":" $storage }}
-{{- range $i, $vol := $vols }}
-{{- $parts := splitList "," $vol }}
-{{- $mountPath := index $parts 0 }}
-{{- $customName := "" }}
-{{- if gt (len $parts) 2 }}
-{{- $customName = index $parts 2 }}
-{{- end }}
-{{- $name := $customName }}
-{{- if not $name }}
-{{- $name = replace "/" "-" $mountPath | trimPrefix "-" }}
-{{- end }}
+{{- range $volStr := $vols }}
+{{- $vol := include "simple.parseStorageVolume" $volStr | fromYaml }}
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ $name }}
+  name: {{ $vol.name }}
   annotations:
     "helm.sh/resource-policy": keep
   labels:
@@ -26,7 +17,7 @@ spec:
   volumeMode: Filesystem
   resources:
     requests:
-      storage: {{ index $parts 1 }}
+      storage: {{ $vol.size }}
 ---
 {{- end }}
 {{- end }}
