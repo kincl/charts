@@ -1,0 +1,18 @@
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: {{ include "simple.name" . }}
+  labels:
+    {{- include "simple.labels" . | nindent 4 }}
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+    - from:
+        kind: DockerImage
+        name: {{ .Values.image }}
+      importPolicy:
+        importMode: Legacy
+      name: {{ include "simple.imageTag" .Values.image }}
+      referencePolicy:
+        type: Source

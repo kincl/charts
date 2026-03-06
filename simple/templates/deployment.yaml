@@ -37,7 +37,7 @@ spec:
           {{- with .Values.env }}
           env: {{ include "simple.env" . | indent 12 }}
           {{- end }}
-          image: "{{ .Values.image }}"
+          image: "image-registry.openshift-image-registry.svc:5000/{{ .Release.Namespace }}/{{ include "simple.name" . }}:{{ include "simple.imageTag" .Values.image }}"
           imagePullPolicy: {{ .Values.imagePullPolicy }}
           {{- with .Values.livenessProbe }}
           livenessProbe:

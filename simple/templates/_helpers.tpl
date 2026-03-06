@@ -171,3 +171,41 @@ volumeMounts:
 {{- end }}
 {{- end }}
 {{- end }}
+
+{{/*
+Extract registry from docker image
+Usage: {{ include "simple.imageRegistry" .Values.image }}
+Example: "docker.io/emby/embyserver:4.9.1.33" → "docker.io/emby/embyserver"
+*/}}
+{{- define "simple.imageRegistry" -}}
+{{- $parts := regexSplit ":" . -1 }}
+{{- $registry := "" }}
+{{- if gt (len $parts) 1 }}
+{{- range $i, $part := $parts }}
+{{- if lt $i (sub (len $parts) 1) }}
+{{- if $registry }}
+{{- $registry = printf "%s:%s" $registry $part }}
+{{- else }}
+{{- $registry = $part }}
+{{- end }}
+{{- end }}
+{{- end }}
+{{- else }}
+{{- $registry = . }}
+{{- end }}
+{{- $registry }}
+{{- end }}
+
+{{/*
+Extract tag from docker image
+Usage: {{ include "simple.imageTag" .Values.image }}
+Example: "docker.io/emby/embyserver:4.9.1.33" → "4.9.1.33"
+*/}}
+{{- define "simple.imageTag" -}}
+{{- $parts := regexSplit ":" . -1 }}
+{{- if gt (len $parts) 1 }}
+{{- last $parts }}
+{{- else }}
+{{- "latest" }}
+{{- end }}
+{{- end }}
