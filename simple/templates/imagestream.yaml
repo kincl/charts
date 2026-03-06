@@ -10,9 +10,9 @@ spec:
   tags:
     - from:
         kind: DockerImage
-        name: {{ .Values.image }}
+        name: "{{ .Values.image }}"
       importPolicy:
         importMode: Legacy
-      name: {{ include "simple.imageTag" .Values.image }}
+      name: "{{ include "simple.imageTag" .Values.image }}"
       referencePolicy:
         type: Source
