@@ -6,7 +6,7 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: {{ include "simple.name" . }}-{{ $vol.name }}
+  name: {{ include "simple.name" $ }}-{{ $vol.name }}
   annotations:
     "helm.sh/resource-policy": keep
   labels:
