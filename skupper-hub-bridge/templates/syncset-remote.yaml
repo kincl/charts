@@ -65,7 +65,7 @@ spec:
               # today this doesn't do anything, we aren't forwarding 80/443 to the hub ingress router
               rewrite name regex (.*\.apps\.{{ include "skupper-hub-bridge.escapedZone" . }}) hub-kubernetes.hub-link.svc.cluster.local answer auto
               rewrite name exact api.{{ .Values.dns.zone }} hub-kubernetes.hub-link.svc.cluster.local
-              forward . {{ .Values.dns.upstreamIP }}
+              forward . /etc/resolv.conf
               prometheus :9153
           }
     - apiVersion: apps/v1

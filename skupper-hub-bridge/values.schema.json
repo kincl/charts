@@ -15,12 +15,6 @@
           "description": "Service IP address",
           "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$",
           "examples": ["172.30.0.5"]
-        },
-        "upstreamIP": {
-          "type": "string",
-          "description": "Upstream IP address",
-          "pattern": "^(?:[0-9]{1,3}\\.){3}[0-9]{1,3}$",
-          "examples": ["172.30.0.10"]
         }
       },
       "required": ["zone"],
