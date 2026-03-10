@@ -4,12 +4,3 @@ metadata:
   name: hub
 spec:
   linkAccess: none
----
-apiVersion: skupper.io/v2alpha1
-kind: Connector
-metadata:
-  name: hub-kubernetes
-spec:
-  routingKey: hub-kubernetes
-  host: 172.30.0.1
-  port: 443

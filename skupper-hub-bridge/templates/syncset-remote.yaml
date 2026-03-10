@@ -63,7 +63,7 @@ spec:
                   rcode NOERROR
               }
               # today this doesn't do anything, we aren't forwarding 80/443 to the hub ingress router
-              rewrite name regex (.*\.apps\.{{ include "skupper-hub-bridge.escapedZone" . }}) hub-kubernetes.hub-link.svc.cluster.local answer auto
+              rewrite name regex (.*\.apps\.{{ include "skupper-hub-bridge.escapedZone" . }}) hub-apps.hub-link.svc.cluster.local answer auto
               rewrite name exact api.{{ .Values.dns.zone }} hub-kubernetes.hub-link.svc.cluster.local
               forward . /etc/resolv.conf
               prometheus :9153
@@ -226,3 +226,12 @@ spec:
         routingKey: hub-kubernetes
         host: hub-kubernetes
         port: 6443
+    - apiVersion: skupper.io/v2alpha1
+      kind: Listener
+      metadata:
+        name: hub-apps
+        namespace: hub-link
+      spec:
+        routingKey: hub-apps
+        host: hub-apps
+        port: 443

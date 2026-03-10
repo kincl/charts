@@ -3,6 +3,10 @@ dns:
   zone: example.com
   serviceIP: 172.30.0.5
 
+routing:
+  kubernetes: true
+  apps: false
+
 job:
   repository: image-registry.openshift-image-registry.svc:5000/openshift/cli
   tag: latest

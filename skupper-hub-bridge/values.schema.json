@@ -25,6 +25,23 @@
       "description": "Name of the cluster (defaults to namespace)",
       "examples": ["my-cluster"]
     },
+    "routing": {
+      "type": "object",
+      "description": "Controls which hub connectors are created",
+      "properties": {
+        "kubernetes": {
+          "type": "boolean",
+          "description": "If true, create the hub-kubernetes connector",
+          "default": true
+        },
+        "apps": {
+          "type": "boolean",
+          "description": "If true, create the hub-apps connector",
+          "default": false
+        }
+      },
+      "additionalProperties": false
+    },
     "job": {
       "type": "object",
       "properties": {

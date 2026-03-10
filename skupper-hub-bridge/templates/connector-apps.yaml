@@ -1,0 +1,10 @@
+{{- if .Values.routing.apps }}
+apiVersion: skupper.io/v2alpha1
+kind: Connector
+metadata:
+  name: hub-apps
+spec:
+  routingKey: hub-apps
+  host: router-internal-default.openshift-ingress.svc.cluster.local
+  port: 443
+{{- end }}
