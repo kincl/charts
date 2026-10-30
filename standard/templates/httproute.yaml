@@ -1,0 +1,28 @@
+{{- if and .Values.expose.hostname (eq (include "standard.exposeType" .) "httproute") }}
+{{- if not .Values.expose.parentRefs }}
+{{- fail "expose.parentRefs is required for expose.type httproute" }}
+{{- end }}
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: {{ include "standard.name" . }}
+  labels:
+    {{- include "standard.labels" . | nindent 4 }}
+  {{- with .Values.expose.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  parentRefs:
+    {{- toYaml .Values.expose.parentRefs | nindent 4 }}
+  hostnames:
+    - {{ .Values.expose.hostname | quote }}
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: {{ .Values.expose.path }}
+      backendRefs:
+        - name: {{ include "standard.name" . }}
+          port: {{ include "standard.servicePort" . }}
+{{- end }}

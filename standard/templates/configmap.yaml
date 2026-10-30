@@ -1,0 +1,17 @@
+{{- with .Values.files }}
+{{- $data := dict }}
+{{- range $path, $content := . }}
+{{- if not (hasPrefix "/" $path) }}
+{{- fail (printf "files: %q must be an absolute path" $path) }}
+{{- end }}
+{{- $_ := set $data (include "standard.fileKey" $path) $content }}
+{{- end }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "standard.name" $ }}-files
+  labels:
+    {{- include "standard.labels" $ | nindent 4 }}
+data:
+  {{- toYaml $data | nindent 2 }}
+{{- end }}

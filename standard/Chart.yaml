@@ -1,0 +1,5 @@
+apiVersion: v2
+name: standard
+description: One container as a Deployment and Service, with optional config files, storage and an Ingress, HTTPRoute or Route
+type: application
+version: 0.1.0

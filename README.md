@@ -16,6 +16,8 @@ Then you can install the charts:
 ```bash
 helm install my-release kincl/simple
 # or
+helm install my-app kincl/standard -f values.yaml
+# or
 helm install my-bridge kincl/skupper-hub-bridge
 ```
 
@@ -24,6 +26,11 @@ helm install my-bridge kincl/skupper-hub-bridge
 ### Simple Chart
 
 A flexible, general-purpose Helm chart for deploying applications on Kubernetes.
+
+### Standard Chart
+
+One container as a Deployment and Service, with optional config files, persistent storage and
+an Ingress, HTTPRoute or OpenShift Route. Works on plain Kubernetes and OpenShift.
 
 ### Skupper Hub Bridge Chart
 

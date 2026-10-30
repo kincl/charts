@@ -1,0 +1,34 @@
+{{- if and .Values.expose.hostname (eq (include "standard.exposeType" .) "ingress") }}
+{{- $name := include "standard.name" . }}
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: {{ $name }}
+  labels:
+    {{- include "standard.labels" . | nindent 4 }}
+  {{- with .Values.expose.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  {{- with .Values.expose.className }}
+  ingressClassName: {{ . }}
+  {{- end }}
+  {{- if .Values.expose.tls }}
+  tls:
+    - hosts:
+        - {{ .Values.expose.hostname | quote }}
+      secretName: {{ .Values.expose.tlsSecretName | default (printf "%s-tls" $name) }}
+  {{- end }}
+  rules:
+    - host: {{ .Values.expose.hostname | quote }}
+      http:
+        paths:
+          - path: {{ .Values.expose.path }}
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ $name }}
+                port:
+                  name: http
+{{- end }}

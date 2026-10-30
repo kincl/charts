@@ -1,0 +1,28 @@
+{{- if and .Values.expose.hostname (eq (include "standard.exposeType" .) "route") }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ include "standard.name" . }}
+  labels:
+    {{- include "standard.labels" . | nindent 4 }}
+  {{- with .Values.expose.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  host: {{ .Values.expose.hostname | quote }}
+  {{- if ne .Values.expose.path "/" }}
+  path: {{ .Values.expose.path }}
+  {{- end }}
+  port:
+    targetPort: http
+  {{- if .Values.expose.tls }}
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  {{- end }}
+  to:
+    kind: Service
+    name: {{ include "standard.name" . }}
+    weight: 100
+{{- end }}

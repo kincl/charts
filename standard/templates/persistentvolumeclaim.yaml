@@ -1,0 +1,27 @@
+{{- $name := include "standard.name" . }}
+{{- range $volName, $vol := .Values.persistence }}
+{{- if not $vol.existingClaim }}
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: {{ $name }}-{{ $volName }}
+  labels:
+    {{- include "standard.labels" $ | nindent 4 }}
+  {{- if or (not (hasKey $vol "keep")) $vol.keep }}
+  annotations:
+    helm.sh/resource-policy: keep
+    argocd.argoproj.io/sync-options: Prune=false,Delete=false
+  {{- end }}
+spec:
+  accessModes:
+    - {{ $vol.accessMode | default "ReadWriteOnce" }}
+  volumeMode: Filesystem
+  {{- with $vol.storageClass }}
+  storageClassName: {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ required (printf "persistence.%s.size is required" $volName) $vol.size }}
+{{- end }}
+{{- end }}

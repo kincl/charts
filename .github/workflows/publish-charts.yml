@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'simple/**'
+      - 'standard/**'
       - 'skupper-hub-bridge/**'
       - '.github/workflows/publish-charts.yml'
   workflow_dispatch:
@@ -42,7 +43,7 @@ jobs:
 
       - name: Package Helm Charts
         run: |
-          for chart in simple skupper-hub-bridge; do
+          for chart in simple standard skupper-hub-bridge; do
             helm package $chart -d .gh-pages/charts
           done
 

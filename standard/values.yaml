@@ -1,0 +1,103 @@
+# Container image, e.g. docker.io/searxng/searxng:2026.10.27-abc1234 (required)
+image: ""
+imagePullPolicy: IfNotPresent
+replicas: 1
+# Recreate, so a ReadWriteOnce volume is released before the new pod starts
+strategy: Recreate
+
+command: []
+args: []
+
+# Main container port. It is named "http"; the Service, expose and healthCheck use it.
+port: ""
+# More ports, name: containerPort, e.g. {metrics: 9090}. Added to the Service under the same name.
+extraPorts: {}
+
+# Literal environment variables, NAME: value (values are rendered as strings)
+env: {}
+# Raw EnvVar list, for valueFrom (secretKeyRef, fieldRef, ...)
+extraEnv: []
+# - name: API_KEY
+#   valueFrom:
+#     secretKeyRef:
+#       name: myapp
+#       key: api-key
+# Raw EnvFromSource list
+envFrom: []
+
+# Files rendered into a ConfigMap, absolute path: content. Each file is mounted read-only
+# with subPath at its path; a change rolls the pod (subPath mounts don't hot-reload).
+files: {}
+# /etc/myapp/config.yml: |
+#   key: value
+
+# PersistentVolumeClaims, name: settings. Mounted at mountPath; the PVC is <release>-<name>.
+persistence: {}
+# data:
+#   mountPath: /data
+#   size: 1Gi
+#   storageClass: ""          # empty uses the cluster default
+#   accessMode: ReadWriteOnce
+#   existingClaim: ""         # use a PVC created outside the chart instead of creating one
+#   keep: true                # keep the PVC on uninstall / Argo CD prune (default true)
+
+# HTTP GET path for liveness and readiness probes on the "http" port, e.g. /healthz.
+# livenessProbe / readinessProbe override it.
+healthCheck: ""
+livenessProbe: {}
+readinessProbe: {}
+startupProbe: {}
+
+service:
+  type: ClusterIP
+  # Service port for "http"; defaults to port
+  port: ""
+  # appProtocol for "http", e.g. kubernetes.io/h2c
+  appProtocol: ""
+  annotations: {}
+
+# Publish the "http" port at a hostname. Nothing is created when hostname is empty.
+expose:
+  hostname: ""
+  # ingress | httproute | route. Empty: route on OpenShift, otherwise ingress.
+  type: ""
+  path: /
+  annotations: {}
+  # ingress: ingressClassName
+  className: ""
+  # ingress: TLS for hostname from secret tlsSecretName (default <release>-tls, e.g. issued by
+  # cert-manager). route: edge termination with HTTP redirect. Ignored for httproute.
+  tls: true
+  tlsSecretName: ""
+  # httproute: Gateway parentRefs (required)
+  parentRefs: []
+  # - name: my-gateway
+  #   namespace: gateways
+  #   sectionName: https
+
+openshift:
+  # Import image through an ImageStream and pull it from the internal registry
+  imageStream: false
+  # Grant this SCC to the service account, e.g. anyuid, nonroot-v2, privileged
+  scc: ""
+
+serviceAccount:
+  create: false
+  automount: true
+  annotations: {}
+  # If not set and create is true, the release name is used
+  name: ""
+
+podAnnotations: {}
+podLabels: {}
+podSecurityContext: {}
+securityContext: {}
+resources: {}
+
+# Raw volumes and volumeMounts, added after files and persistence
+extraVolumes: []
+extraVolumeMounts: []
+
+nodeSelector: {}
+tolerations: []
+affinity: {}

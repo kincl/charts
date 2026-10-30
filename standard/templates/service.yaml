@@ -1,0 +1,32 @@
+{{- if or .Values.port .Values.extraPorts }}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "standard.name" . }}
+  labels:
+    {{- include "standard.labels" . | nindent 4 }}
+  {{- with .Values.service.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  ports:
+    {{- if .Values.port }}
+    - name: http
+      port: {{ include "standard.servicePort" . }}
+      targetPort: http
+      protocol: TCP
+      {{- with .Values.service.appProtocol }}
+      appProtocol: {{ . }}
+      {{- end }}
+    {{- end }}
+    {{- range $portName, $port := .Values.extraPorts }}
+    - name: {{ $portName }}
+      port: {{ $port }}
+      targetPort: {{ $portName }}
+      protocol: TCP
+    {{- end }}
+  selector:
+    {{- include "standard.selectorLabels" . | nindent 4 }}
+{{- end }}
